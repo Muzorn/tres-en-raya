@@ -56,6 +56,27 @@ class Partida
      */
     private $empate;
 
+    /**
+     * Una partida puede tener un ganador.
+     * @ORM\ManyToOne(targetEntity="Jugador")
+     * @ORM\JoinColumn(name="ganador_id", referencedColumnName="id")
+     */
+    private $ganador;
+
+    /**
+     * En una partida juega un jugador.
+     * @ORM\ManyToOne(targetEntity="Jugador")
+     * @ORM\JoinColumn(name="jugador_2_id", referencedColumnName="id")
+     */
+    private $jugador1;
+
+    /**
+     * En una partida juega un segundo jugador.
+     * @ORM\ManyToOne(targetEntity="Jugador")
+     * @ORM\JoinColumn(name="jugador_2_id", referencedColumnName="id")
+     */
+    private $jugador2;
+
 
     /**
      * Get id
@@ -170,5 +191,96 @@ class Partida
     {
         $this->empate = $empate;
     }
-}
 
+    /**
+     * Get finalizada
+     *
+     * @return boolean
+     */
+    public function getFinalizada()
+    {
+        return $this->finalizada;
+    }
+
+    /**
+     * Get empate
+     *
+     * @return boolean
+     */
+    public function getEmpate()
+    {
+        return $this->empate;
+    }
+
+    /**
+     * Set ganador
+     *
+     * @param \AppBundle\Entity\Jugador $ganador
+     *
+     * @return Partida
+     */
+    public function setGanador(Jugador $ganador = null)
+    {
+        $this->ganador = $ganador;
+
+        return $this;
+    }
+
+    /**
+     * Get ganador
+     *
+     * @return \AppBundle\Entity\Jugador
+     */
+    public function getGanador()
+    {
+        return $this->ganador;
+    }
+
+    /**
+     * Set jugador1
+     *
+     * @param \AppBundle\Entity\Jugador $jugador1
+     *
+     * @return Partida
+     */
+    public function setJugador1(Jugador $jugador1 = null)
+    {
+        $this->jugador1 = $jugador1;
+
+        return $this;
+    }
+
+    /**
+     * Get jugador1
+     *
+     * @return \AppBundle\Entity\Jugador
+     */
+    public function getJugador1()
+    {
+        return $this->jugador1;
+    }
+
+    /**
+     * Set jugador2
+     *
+     * @param \AppBundle\Entity\Jugador $jugador2
+     *
+     * @return Partida
+     */
+    public function setJugador2(Jugador $jugador2 = null)
+    {
+        $this->jugador2 = $jugador2;
+
+        return $this;
+    }
+
+    /**
+     * Get jugador2
+     *
+     * @return \AppBundle\Entity\Jugador
+     */
+    public function getJugador2()
+    {
+        return $this->jugador2;
+    }
+}
