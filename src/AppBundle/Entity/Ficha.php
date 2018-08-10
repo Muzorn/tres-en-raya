@@ -36,6 +36,13 @@ class Ficha
     private $posColumna;
 
     /**
+     * Varias Fichas pueden ser de un Tipo.
+     * @ORM\ManyToOne(targetEntity="TipoFicha")
+     * @ORM\JoinColumn(name="tipo_ficha_id", referencedColumnName="id")
+     */
+    private $tipo;
+
+    /**
      * Varias Fichas están puestas sobre un Tablero.
      * @ORM\ManyToOne(targetEntity="Tablero", inversedBy="fichas")
      * @ORM\JoinColumn(name="tablero_id", referencedColumnName="id")
@@ -123,5 +130,29 @@ class Ficha
     public function getTablero()
     {
         return $this->tablero;
+    }
+
+    /**
+     * Set tipo
+     *
+     * @param \AppBundle\Entity\TipoFicha $tipo
+     *
+     * @return Ficha
+     */
+    public function setTipo(\AppBundle\Entity\TipoFicha $tipo = null)
+    {
+        $this->tipo = $tipo;
+
+        return $this;
+    }
+
+    /**
+     * Get tipo
+     *
+     * @return \AppBundle\Entity\TipoFicha
+     */
+    public function getTipo()
+    {
+        return $this->tipo;
     }
 }
