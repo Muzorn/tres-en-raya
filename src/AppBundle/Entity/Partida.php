@@ -77,6 +77,19 @@ class Partida
      */
     private $jugador2;
 
+    /**
+     * Una Partida se juega en un único Tablero.
+     * @ORM\OneToOne(targetEntity="Tablero")
+     * @ORM\JoinColumn(name="tablero_id", referencedColumnName="id")
+     */
+    private $tablero;
+
+    /**
+     * Una Partida se juega en varios Turnos.
+     * @ORM\OneToMany(targetEntity="Turno", mappedBy="partida")
+     */
+    private $turnos;
+
 
     /**
      * Get id
@@ -282,5 +295,70 @@ class Partida
     public function getJugador2()
     {
         return $this->jugador2;
+    }
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->turnos = new \Doctrine\Common\Collections\ArrayCollection();
+    }
+
+    /**
+     * Set tablero
+     *
+     * @param \AppBundle\Entity\Tablero $tablero
+     *
+     * @return Partida
+     */
+    public function setTablero(\AppBundle\Entity\Tablero $tablero = null)
+    {
+        $this->tablero = $tablero;
+
+        return $this;
+    }
+
+    /**
+     * Get tablero
+     *
+     * @return \AppBundle\Entity\Tablero
+     */
+    public function getTablero()
+    {
+        return $this->tablero;
+    }
+
+    /**
+     * Add turno
+     *
+     * @param \AppBundle\Entity\Turno $turno
+     *
+     * @return Partida
+     */
+    public function addTurno(\AppBundle\Entity\Turno $turno)
+    {
+        $this->turnos[] = $turno;
+
+        return $this;
+    }
+
+    /**
+     * Remove turno
+     *
+     * @param \AppBundle\Entity\Turno $turno
+     */
+    public function removeTurno(\AppBundle\Entity\Turno $turno)
+    {
+        $this->turnos->removeElement($turno);
+    }
+
+    /**
+     * Get turnos
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getTurnos()
+    {
+        return $this->turnos;
     }
 }

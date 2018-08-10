@@ -21,6 +21,13 @@ class Turno
      */
     private $id;
 
+    /**
+     * Varios turnos se juegan en una Partida.
+     * @ORM\ManyToOne(targetEntity="Partida", inversedBy="turnos")
+     * @ORM\JoinColumn(name="partida_id", referencedColumnName="id")
+     */
+    private $partida;
+
 
     /**
      * Get id
@@ -31,5 +38,28 @@ class Turno
     {
         return $this->id;
     }
-}
 
+    /**
+     * Set partida
+     *
+     * @param \AppBundle\Entity\Partida $partida
+     *
+     * @return Turno
+     */
+    public function setPartida(\AppBundle\Entity\Partida $partida = null)
+    {
+        $this->partida = $partida;
+
+        return $this;
+    }
+
+    /**
+     * Get partida
+     *
+     * @return \AppBundle\Entity\Partida
+     */
+    public function getPartida()
+    {
+        return $this->partida;
+    }
+}

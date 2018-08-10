@@ -35,6 +35,13 @@ class Tablero
      */
     private $numColumnas;
 
+    /**
+     * Un Tablero se juega en una Partida.
+     * @ORM\OneToOne(targetEntity="Partida", inversedBy="tablero")
+     * @ORM\JoinColumn(name="partida_id", referencedColumnName="id")
+     */
+    private $partida;
+
 
     /**
      * Get id
@@ -103,5 +110,28 @@ class Tablero
     {
         return $this->numColumnas * $this->numFilas;
     }
-}
 
+    /**
+     * Set partida
+     *
+     * @param \AppBundle\Entity\Partida $partida
+     *
+     * @return Tablero
+     */
+    public function setPartida(\AppBundle\Entity\Partida $partida = null)
+    {
+        $this->partida = $partida;
+
+        return $this;
+    }
+
+    /**
+     * Get partida
+     *
+     * @return \AppBundle\Entity\Partida
+     */
+    public function getPartida()
+    {
+        return $this->partida;
+    }
+}
