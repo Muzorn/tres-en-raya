@@ -44,6 +44,13 @@ class Tablero
 
 
     /**
+     * Un Tablero tiene puestas varias Fichas.
+     * @ORM\OneToMany(targetEntity="Ficha", mappedBy="tablero")
+     */
+    private $fichas;
+
+
+    /**
      * Get id
      *
      * @return int
@@ -133,5 +140,46 @@ class Tablero
     public function getPartida()
     {
         return $this->partida;
+    }
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->fichas = new \Doctrine\Common\Collections\ArrayCollection();
+    }
+
+    /**
+     * Add ficha
+     *
+     * @param \AppBundle\Entity\Ficha $ficha
+     *
+     * @return Tablero
+     */
+    public function addFicha(\AppBundle\Entity\Ficha $ficha)
+    {
+        $this->fichas[] = $ficha;
+
+        return $this;
+    }
+
+    /**
+     * Remove ficha
+     *
+     * @param \AppBundle\Entity\Ficha $ficha
+     */
+    public function removeFicha(\AppBundle\Entity\Ficha $ficha)
+    {
+        $this->fichas->removeElement($ficha);
+    }
+
+    /**
+     * Get fichas
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getFichas()
+    {
+        return $this->fichas;
     }
 }

@@ -35,6 +35,13 @@ class Ficha
      */
     private $posColumna;
 
+    /**
+     * Varias Fichas están puestas sobre un Tablero.
+     * @ORM\ManyToOne(targetEntity="Tablero", inversedBy="fichas")
+     * @ORM\JoinColumn(name="tablero_id", referencedColumnName="id")
+     */
+    private $tablero;
+
 
     /**
      * Get id
@@ -93,5 +100,28 @@ class Ficha
     {
         return $this->posColumna;
     }
-}
 
+    /**
+     * Set tablero
+     *
+     * @param \AppBundle\Entity\Tablero $tablero
+     *
+     * @return Ficha
+     */
+    public function setTablero(\AppBundle\Entity\Tablero $tablero = null)
+    {
+        $this->tablero = $tablero;
+
+        return $this;
+    }
+
+    /**
+     * Get tablero
+     *
+     * @return \AppBundle\Entity\Tablero
+     */
+    public function getTablero()
+    {
+        return $this->tablero;
+    }
+}
