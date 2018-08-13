@@ -30,7 +30,7 @@ class Turno
 
     /**
      * Varios turnos son jugados por un Jugador.
-     * @ORM\ManyToOne(targetEntity="Jugador", inversedBy="turnos")
+     * @ORM\ManyToOne(targetEntity="Jugador")
      * @ORM\JoinColumn(name="jugador_id", referencedColumnName="id")
      */
     private $jugadoPor;
