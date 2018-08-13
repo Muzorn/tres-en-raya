@@ -12,7 +12,13 @@
     <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}"/>
 </head>
 <body>
-{% block body %}{% endblock %}
+<div class="container">
+    {% block header %}
+        {% include 'default/header.html.twig' %}
+    {% endblock %}
+    {% block body %}{% endblock %}
+</div>
+
 {% block javascripts %}
     <!-- JS needed for Bootstrap -->
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"

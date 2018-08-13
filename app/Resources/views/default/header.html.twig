@@ -1,0 +1,15 @@
+<div class="row">
+    <div class="col-sm-12 col-md-12 col-lg-12">
+        <div class="jumbotron">
+            <h1 class="display-4">¡Bienvenido al juego del 3 en raya!</h1>
+            <p class="lead">Juego de 2 jugadores.</p>
+            <hr class="my-4">
+            {% if partida is defined and partida is not null %}
+                En estos momentos ya hay una partida en curso. Termínala para poder comenzar una nueva.
+            {% else %}
+                <p>Para empezar una nueva partida, pulsa en el botón que se muestra a continuación:</p>
+                <a class="btn btn-primary btn-lg" href="{{ path('nueva_partida') }}" role="button">Empezar partida</a>
+            {% endif %}
+        </div>
+    </div>
+</div>
