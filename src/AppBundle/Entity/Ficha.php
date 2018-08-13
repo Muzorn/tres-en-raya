@@ -49,6 +49,13 @@ class Ficha
      */
     private $tablero;
 
+    /**
+     * Varias Fichas son puestas por un Jugador.
+     * @ORM\ManyToOne(targetEntity="Jugador")
+     * @ORM\JoinColumn(name="jugador_id", referencedColumnName="id")
+     */
+    private $jugador;
+
 
     /**
      * Get id
@@ -154,5 +161,29 @@ class Ficha
     public function getTipo()
     {
         return $this->tipo;
+    }
+
+    /**
+     * Set jugador
+     *
+     * @param \AppBundle\Entity\Jugador $jugador
+     *
+     * @return Ficha
+     */
+    public function setJugador(\AppBundle\Entity\Jugador $jugador = null)
+    {
+        $this->jugador = $jugador;
+
+        return $this;
+    }
+
+    /**
+     * Get jugador
+     *
+     * @return \AppBundle\Entity\Jugador
+     */
+    public function getJugador()
+    {
+        return $this->jugador;
     }
 }
