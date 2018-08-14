@@ -36,15 +36,16 @@ class DefaultController extends Controller
             /* @var Ficha :array $fichas */
             $fichas = $tablero->getFichas();
 
+            $matrizFichas = $em->getRepository('AppBundle:Tablero')->getMatrizFichasPuestas($tablero);
+
             //Redirigimos a la inicialización de la partida
             return $this->render('default/partida.html.twig', [
                 'partida' => $partida,
                 'tablero' => $tablero,
-                'fichas' => $fichas
+                'fichas' => $matrizFichas
             ]);
         }
 
-        // replace this example code with whatever you need
         return $this->render('default/index.html.twig', [
             'base_dir' => realpath($this->getParameter('kernel.project_dir')).DIRECTORY_SEPARATOR,
             'partida' => $partida
@@ -128,11 +129,12 @@ class DefaultController extends Controller
         $tipoFichaRepository = $em->getRepository('AppBundle:TipoFicha');
 
         $tablero = $partida->getTablero();
+        $dimensionTablero = $tablero->getDimension();
 
         $numFichasPuestas = $tableroRepository->getNumeroFichasPuestas($tablero);
 
         //Comprobar si se puede poner ficha
-        if ($numFichasPuestas >= 0 && $numFichasPuestas <=8) {
+        if ($numFichasPuestas >= 0 && $numFichasPuestas <= ($dimensionTablero - 1)) {
             //Tipos de Ficha
             $tipoFichaX = $tipoFichaRepository->findOneBy(['simbolo' => 'X']);
             $tipoFichaO = $tipoFichaRepository->findOneBy(['simbolo' => 'O']);

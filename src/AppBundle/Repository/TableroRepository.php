@@ -1,6 +1,7 @@
 <?php
 
 namespace AppBundle\Repository;
+use AppBundle\Entity\Ficha;
 use AppBundle\Entity\Tablero;
 
 /**
@@ -20,5 +21,35 @@ class TableroRepository extends \Doctrine\ORM\EntityRepository
     public function getNumeroFichasPuestas(Tablero $tablero)
     {
         return count($tablero->getFichas());
+    }
+
+    /**
+     * Genera una matriz con la disposición de las fichas de un Tablero por filas y por columnas.
+     *
+     * @param Tablero $tablero
+     * @return [][]
+     */
+    public function getMatrizFichasPuestas(Tablero $tablero)
+    {
+        $fichas = $tablero->getFichas();
+        $filasTablero = $tablero->getNumFilas();
+        $columnasTablero = $tablero->getNumColumnas();
+
+        $matrizFichas = [];
+
+        //Generamos una matriz sobre la que poder colocar, y posteriormente acceder, de forma fácil las fichas de un tablero
+        for ($i = 0; $i < $filasTablero; $i++) {
+            for ($j = 0; $j < $columnasTablero; $j++) {
+                $matrizFichas[$i][$j] = null;
+            }
+        }
+
+        /* @var Ficha $ficha */
+        foreach ($fichas as $ficha) {
+            //Colocamos cada Ficha puesta en el Tablero sobre la matriz definida anteriormente
+            $matrizFichas[$ficha->getPosFila()][$ficha->getPosColumna()] = $ficha;
+        }
+
+        return $matrizFichas;
     }
 }
