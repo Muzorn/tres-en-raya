@@ -1,6 +1,7 @@
 <?php
 
 namespace AppBundle\Repository;
+use AppBundle\Entity\Tablero;
 
 /**
  * TableroRepository
@@ -10,4 +11,14 @@ namespace AppBundle\Repository;
  */
 class TableroRepository extends \Doctrine\ORM\EntityRepository
 {
+    /**
+     * Obtiene el número de fichas que hay puestas en un Tablero.
+     *
+     * @param Tablero $tablero
+     * @return integer
+     */
+    public function getNumeroFichasPuestas(Tablero $tablero)
+    {
+        return count($tablero->getFichas());
+    }
 }

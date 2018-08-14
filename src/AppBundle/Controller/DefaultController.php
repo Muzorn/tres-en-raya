@@ -6,6 +6,9 @@ use AppBundle\Entity\Ficha;
 use AppBundle\Entity\Jugador;
 use AppBundle\Entity\Partida;
 use AppBundle\Entity\Tablero;
+use AppBundle\Entity\TipoFicha;
+use AppBundle\Entity\Turno;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
@@ -54,6 +57,25 @@ class DefaultController extends Controller
     public function nuevaPartidaAction()
     {
         $em = $this->getDoctrine()->getManager();
+        $tipoFichaRepository = $em->getRepository('AppBundle:TipoFicha');
+
+        //Inicializamos los tipos de Ficha básicos
+        $tipoFichaX = $tipoFichaRepository->findOneBy(['simbolo' => 'X']);
+        $tipoFichaO = $tipoFichaRepository->findOneBy(['simbolo' => 'O']);
+
+        if (!$tipoFichaX) {
+            $tipoFichaX = new TipoFicha();
+            $tipoFichaX->setSimbolo("X");
+
+            $em->persist($tipoFichaX);
+        }
+
+        if (!$tipoFichaO) {
+            $tipoFichaO = new TipoFicha();
+            $tipoFichaO->setSimbolo("O");
+
+            $em->persist($tipoFichaO);
+        }
 
         //Creamos una Partida
         $partida = new Partida();
@@ -89,6 +111,68 @@ class DefaultController extends Controller
         $em->persist($jugador2);
 
         $em->flush();
+
+        return $this->redirectToRoute('homepage');
+    }
+
+    /**
+     * @Route("/partida/{id}/poner-ficha/{fila}-{columna}", name="poner_ficha")
+     *
+     * @ParamConverter("partida", options={"mapping": {"id" : "id"}})
+     *
+     */
+    public function ponerFichaAction(Partida $partida, $fila, $columna)
+    {
+        $em = $this->getDoctrine()->getManager();
+        $tableroRepository = $em->getRepository('AppBundle:Tablero');
+        $tipoFichaRepository = $em->getRepository('AppBundle:TipoFicha');
+
+        $tablero = $partida->getTablero();
+
+        $numFichasPuestas = $tableroRepository->getNumeroFichasPuestas($tablero);
+
+        //Comprobar si se puede poner ficha
+        if ($numFichasPuestas >= 0 && $numFichasPuestas <=8) {
+            //Tipos de Ficha
+            $tipoFichaX = $tipoFichaRepository->findOneBy(['simbolo' => 'X']);
+            $tipoFichaO = $tipoFichaRepository->findOneBy(['simbolo' => 'O']);
+
+            //Jugamos turno
+            $turno = new Turno();
+            $em->persist($turno);
+
+            //Ficha
+            $ficha = new Ficha();
+            $em->persist($ficha);
+
+            //Todavía no se ha puesto ninguna ficha (primer turno) o turno del jugador 1
+            if ($numFichasPuestas === 0 || ($numFichasPuestas % 2) === 0) {
+                $jugador = $partida->getJugador1();
+                $ficha->setTipo($tipoFichaX);
+            }
+            else { //Turno del jugador 2
+                $jugador = $partida->getJugador2();
+                $ficha->setTipo($tipoFichaO);
+            }
+
+            $partida->addTurno($turno);
+            $turno->setPartida($partida);
+
+            $tablero->addFicha($ficha);
+
+            $ficha->setJugador($jugador);
+            $ficha->setPosFila($fila);
+            $ficha->setPosColumna($columna);
+            $ficha->setTablero($tablero);
+
+            $turno->setFicha($ficha);
+            $turno->setJugadoPor($jugador);
+
+            $em->flush();
+        }
+        else { //Tablero completo: ya se han puesto las 9 fichas
+            /* @todo Lógica de comprobación de ganador */
+        }
 
         return $this->redirectToRoute('homepage');
     }
