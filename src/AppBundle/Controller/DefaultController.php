@@ -125,6 +125,7 @@ class DefaultController extends Controller
     public function ponerFichaAction(Partida $partida, $fila, $columna)
     {
         $em = $this->getDoctrine()->getManager();
+        $partidaRepo = $em->getRepository('AppBundle:Partida');
         $tableroRepository = $em->getRepository('AppBundle:Tablero');
         $tipoFichaRepository = $em->getRepository('AppBundle:TipoFicha');
 
@@ -172,9 +173,49 @@ class DefaultController extends Controller
 
             $em->flush();
         }
-        else { //Tablero completo: ya se han puesto las 9 fichas
-            /* @todo Lógica de comprobación de ganador */
+
+        $matrizFichas = $tableroRepository->getMatrizFichasPuestas($tablero);
+        $ganador = $partidaRepo->obtenerGanador($partida, $matrizFichas);
+
+        if (!$ganador && $numFichasPuestas + 1 === $dimensionTablero) { //Empate
+            return $this->redirectToRoute('finalizar_partida', [
+                'partida_id' => $partida->getId(),
+                'ganador_id' => null
+            ]);
         }
+        if ($ganador) {
+            return $this->redirectToRoute('finalizar_partida', [
+                'partida_id' => $partida->getId(),
+                'ganador_id' => $ganador->getId()
+            ]);
+        }
+
+        return $this->redirectToRoute('homepage');
+    }
+
+    /**
+     * @Route("/partida/{partida_id}/finalizar/{ganador_id}", name="finalizar_partida", defaults={"ganador_id" = null})
+     *
+     * @ParamConverter("partida", options={"id" : "partida_id"})
+     * @ParamConverter("ganador", options={"id" : "ganador_id"})
+     */
+    public function finalizarPartida(Partida $partida, Jugador $ganador = null)
+    {
+        $em = $this->getDoctrine()->getManager();
+
+        $empate = false;
+
+        if (!$ganador)
+            $empate = true;
+
+        $partida->setEmpate($empate);
+        $partida->setGanador($ganador);
+        $partida->setFinalizada(true);
+        $partida->setFin(new \DateTime("now"));
+        $partida->setEnCurso(false);
+
+        //Actualizamos el estado de la partida
+        $em->flush();
 
         return $this->redirectToRoute('homepage');
     }
