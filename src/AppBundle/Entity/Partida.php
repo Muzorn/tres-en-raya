@@ -66,7 +66,7 @@ class Partida
     /**
      * En una partida juega un jugador.
      * @ORM\ManyToOne(targetEntity="Jugador")
-     * @ORM\JoinColumn(name="jugador_2_id", referencedColumnName="id")
+     * @ORM\JoinColumn(name="jugador_1_id", referencedColumnName="id")
      */
     private $jugador1;
 
@@ -79,7 +79,7 @@ class Partida
 
     /**
      * Una Partida se juega en un único Tablero.
-     * @ORM\OneToOne(targetEntity="Tablero")
+     * @ORM\OneToOne(targetEntity="Tablero", inversedBy="partida")
      * @ORM\JoinColumn(name="tablero_id", referencedColumnName="id")
      */
     private $tablero;

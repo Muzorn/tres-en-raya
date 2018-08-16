@@ -37,8 +37,7 @@ class Tablero
 
     /**
      * Un Tablero se juega en una Partida.
-     * @ORM\OneToOne(targetEntity="Partida", inversedBy="tablero")
-     * @ORM\JoinColumn(name="partida_id", referencedColumnName="id")
+     * @ORM\OneToOne(targetEntity="Partida", mappedBy="tablero")
      */
     private $partida;
 
