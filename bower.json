@@ -1,0 +1,22 @@
+{
+  "name": "3raya",
+  "homepage": "https://github.com/Muzorn/tres-en-raya",
+  "authors": [
+    "Jesús María García Carro <jesusmgc.it@gmail.com>"
+  ],
+  "description": "Juego 3 en raya para dos jugadores como prueba técnica para Hiberus",
+  "main": "",
+  "keywords": [
+    "3",
+    "raya"
+  ],
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}

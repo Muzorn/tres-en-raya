@@ -1,0 +1,37 @@
+<table class="table table-bordered table-hover">
+    <thead>
+    <tr class="text-center">
+        <th scope="col"></th>
+        {% if fichas is defined and fichas is not empty %}
+            {% for key in fichas | keys %}
+                <th scope="col">{{ key }}</th>
+            {% endfor %}
+        {% endif %}
+    </tr>
+    </thead>
+    <tbody>
+        {% if fichas is defined and fichas is not empty %}
+            {% for indiceFila in fichas | keys %}
+                <tr>
+                    <th class="text-center">{{ indiceFila }}</th>
+                    {% for indiceColumna, ficha in fichas[indiceFila] %}
+                        <td class="text-center">
+                        {% if ficha %}
+                            {% set simboloFicha = ficha.tipo.simbolo %}
+                            {% if simboloFicha == "X" %}
+                                <i class="fas fa-times fa-3x"></i>
+                            {% else %}
+                                <i class="far fa-circle fa-3x"></i>
+                            {% endif %}
+                        {% else %}
+                            <a role="button" class="btn btn-xs btn-success" href="{{ path('poner_ficha', {'id': partida.id, 'fila': indiceFila, 'columna': indiceColumna}) }}">
+                                <i class="fas fa-puzzle-piece"></i>
+                            </a>
+                        {% endif %}
+                        </td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        {% endif %}
+    </tbody>
+</table>
