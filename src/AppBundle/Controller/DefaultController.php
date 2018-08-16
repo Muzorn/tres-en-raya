@@ -24,11 +24,10 @@ class DefaultController extends Controller
         $em = $this->getDoctrine()->getManager();
         $partidaRepo = $em->getRepository('AppBundle:Partida');
 
-        //Comprobamos si hay una posible partida en curso
-        $partida = $partidaRepo->findOneBy([
-            'enCurso' => true,
-            'fin' => null
-        ]);
+        //Tratamos de obtener la última Partida jugada (esté o no finalizada)
+        $partida = $partidaRepo->findOneBy([], ['inicio' => 'DESC']);
+
+        $tablero = $fichas = $matrizFichas = null;
 
         if ($partida) {
             /* @var Tablero $tablero */
@@ -37,18 +36,13 @@ class DefaultController extends Controller
             $fichas = $tablero->getFichas();
 
             $matrizFichas = $em->getRepository('AppBundle:Tablero')->getMatrizFichasPuestas($tablero);
-
-            //Redirigimos a la inicialización de la partida
-            return $this->render('default/partida.html.twig', [
-                'partida' => $partida,
-                'tablero' => $tablero,
-                'fichas' => $matrizFichas
-            ]);
         }
 
-        return $this->render('default/index.html.twig', [
-            'base_dir' => realpath($this->getParameter('kernel.project_dir')).DIRECTORY_SEPARATOR,
-            'partida' => $partida
+        //Cargamos la Partida
+        return $this->render('default/partida.html.twig', [
+            'partida' => $partida,
+            'tablero' => $tablero,
+            'fichas' => $matrizFichas
         ]);
     }
 
