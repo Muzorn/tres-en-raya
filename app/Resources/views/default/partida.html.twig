@@ -1,12 +1,22 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    <div class="row">
-        <div class="col-sm-8 col-md-8 col-lg-8">
-            {% if partida is defined and partida is not null %}
+    {% if partida is defined and partida is not null %}
+        {% if partida.finalizada and partida.ganador %}
+            <div class="alert alert-success" role="alert">
+                <strong>¡El jugador "{{ partida.ganador.apodo }}" ha ganado la partida!</strong>
+            </div>
+        {% endif %}
+        {% if partida.finalizada and not partida.ganador %}
+            <div class="alert alert-warning" role="alert">
+                <strong>¡Ha habido un empate!</strong>
+            </div>
+        {% endif %}
+        <div class="row">
+            <div class="col-sm-8 col-md-8 col-lg-8">
                 <h1 class="text-left">Tablero</h1>
                 {% include 'default/tablero.html.twig' %}
-            {% endif %}
+            </div>
         </div>
-    </div>
+    {% endif %}
 {% endblock %}
