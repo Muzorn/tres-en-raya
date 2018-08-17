@@ -1,0 +1,20 @@
+{# Partida terminada con un ganador #}
+{% if partida.finalizada and partida.ganador %}
+    <div class="alert alert-success" role="alert">
+        <strong>¡La partida ha terminado: el jugador "{{ partida.ganador.apodo }}" es el ganador!</strong>
+    </div>
+{% endif %}
+
+{# Partida terminada en empate #}
+{% if partida.finalizada and not partida.ganador %}
+    <div class="alert alert-warning" role="alert">
+        <strong>¡La partida ha terminado: ha habido un empate!</strong>
+    </div>
+{% endif %}
+
+{# Jugador al que le toca poner la siguiente Ficha #}
+{% if sigJugadorTurno %}
+    <div class="alert alert-info" role="alert">
+        <strong>¡Es el turno del jugador "{{ sigJugadorTurno.apodo }}"!</strong>
+    </div>
+{% endif %}
