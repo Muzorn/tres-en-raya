@@ -27,13 +27,16 @@ class DefaultController extends Controller
         //Tratamos de obtener la última Partida jugada (esté o no finalizada)
         $partida = $partidaRepo->findOneBy([], ['inicio' => 'DESC']);
 
-        $tablero = $fichas = $matrizFichas = null;
+        $tablero = $fichas = $matrizFichas = $sigJugadorTurno = null;
 
         if ($partida) {
             /* @var Tablero $tablero */
             $tablero = $partida->getTablero();
             /* @var Ficha :array $fichas */
             $fichas = $tablero->getFichas();
+
+            //Obtenemos el siguiente Jugador en poner Ficha
+            $sigJugadorTurno = $partidaRepo->getSiguienteJugadorTurno($partida);
 
             $matrizFichas = $em->getRepository('AppBundle:Tablero')->getMatrizFichasPuestas($tablero);
         }
@@ -42,7 +45,8 @@ class DefaultController extends Controller
         return $this->render('default/partida.html.twig', [
             'partida' => $partida,
             'tablero' => $tablero,
-            'fichas' => $matrizFichas
+            'fichas' => $matrizFichas,
+            'sigJugadorTurno' => $sigJugadorTurno
         ]);
     }
 
