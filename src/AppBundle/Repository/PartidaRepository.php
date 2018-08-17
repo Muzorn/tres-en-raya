@@ -14,6 +14,29 @@ use AppBundle\Entity\Partida;
 class PartidaRepository extends \Doctrine\ORM\EntityRepository
 {
     /**
+     * Obtiene el siguiente jugador en poner Ficha.
+     *
+     * @param Partida $partida
+     * @return Jugador
+     */
+    public function getSiguienteJugadorTurno(Partida $partida)
+    {
+        $tablero = $partida->getTablero();
+        $numFichas = count($tablero->getFichas());
+
+        $sigJugadorTurno = null;
+
+        if (!$partida->getFinalizada()) {
+            if ($numFichas === 0 || ($numFichas % 2) === 0)
+                $sigJugadorTurno = $partida->getJugador1();
+            else
+                $sigJugadorTurno = $partida->getJugador2();
+        }
+
+        return $sigJugadorTurno;
+    }
+
+    /**
      * Obtiene el posible ganador de una Partida recorriendo el Tablero por filas, columnas y diagonales.
      *
      * @param Partida $partida

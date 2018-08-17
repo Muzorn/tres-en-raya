@@ -2,16 +2,11 @@
 
 {% block body %}
     {% if partida is defined and partida is not null %}
-        {% if partida.finalizada and partida.ganador %}
-            <div class="alert alert-success" role="alert">
-                <strong>¡La partida ha terminado: el jugador "{{ partida.ganador.apodo }}" es el ganador!</strong>
+        <div class="row">
+            <div class="col-sm-12 col-md-12 col-lg-12">
+                {% include 'default/messages.html.twig' %}
             </div>
-        {% endif %}
-        {% if partida.finalizada and not partida.ganador %}
-            <div class="alert alert-warning" role="alert">
-                <strong>¡La partida ha terminado: ha habido un empate!</strong>
-            </div>
-        {% endif %}
+        </div>
         <div class="row d-flex justify-content-between">
             <div class="col-sm-12 col-md-6 col-lg-6">
                 <h2 class="mt-1 mb-4 text-left"><i class="fas fa-th"></i> Tablero</h2>
