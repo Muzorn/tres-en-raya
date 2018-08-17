@@ -13,9 +13,7 @@
                                 <i class="far fa-circle fa-3x"></i>
                             {% endif %}
                         {% else %}
-                            <a role="button" class="btn btn-xs btn-success" data-toggle="tooltip" data-placement="top"
-                               title="Tooltip on top"
-                               href="{{ path('poner_ficha', {'id': partida.id, 'fila': indiceFila, 'columna': indiceColumna}) }}">
+                            <a role="button" class="btn btn-xs btn-success" href="{{ path('poner_ficha', {'id': partida.id, 'fila': indiceFila, 'columna': indiceColumna}) }}">
                                 <i class="fas fa-puzzle-piece"></i>
                             </a>
                         {% endif %}
