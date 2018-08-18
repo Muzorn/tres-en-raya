@@ -1,3 +1,19 @@
+{# Mensajes/Alertas flash generados desde los controladores #}
+{% for label, messages in app.flashes %}
+    {% set bs_alert_type = label %}
+    {% if label == "notice" %}
+        {% set bs_alert_type = "success" %}
+    {% endif %}
+    {% if label == "error" %}
+        {% set bs_alert_type = "danger" %}
+    {% endif %}
+    {% for message in messages %}
+        <div class="alert alert-{{ bs_alert_type }} flash-{{ label }}" role="alert">
+            <strong>{{ message }}</strong>
+        </div>
+    {% endfor %}
+{% endfor %}
+
 {# Partida terminada con un ganador #}
 {% if partida.finalizada and partida.ganador %}
     <div class="alert alert-success" role="alert">
