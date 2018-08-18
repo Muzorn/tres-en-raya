@@ -1,12 +1,12 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    {% if partida is defined and partida is not null %}
-        <div class="row">
-            <div class="col-sm-12 col-md-12 col-lg-12">
-                {% include 'default/messages.html.twig' %}
-            </div>
+    <div class="row">
+        <div class="col-sm-12 col-md-12 col-lg-12">
+            {% include 'default/messages.html.twig' %}
         </div>
+    </div>
+    {% if partida is defined and partida is not null %}
         <div class="row d-flex justify-content-between">
             <div class="col-sm-12 col-md-6 col-lg-6">
                 <h2 class="mt-1 mb-4 text-left"><i class="fas fa-th"></i> Tablero</h2>
