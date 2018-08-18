@@ -8,6 +8,7 @@ use AppBundle\Entity\Partida;
 use AppBundle\Entity\Tablero;
 use AppBundle\Entity\TipoFicha;
 use AppBundle\Entity\Turno;
+use AppBundle\Form\JugadoresPartidaType;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
@@ -29,6 +30,9 @@ class DefaultController extends Controller
 
         $tablero = $fichas = $matrizFichas = $sigJugadorTurno = null;
 
+        //Formulario de inicialización de Partida: introducción de apodos de los jugadores
+        $formJugadores = $this->createForm(JugadoresPartidaType::class, null);
+
         if ($partida) {
             /* @var Tablero $tablero */
             $tablero = $partida->getTablero();
@@ -46,72 +50,88 @@ class DefaultController extends Controller
             'partida' => $partida,
             'tablero' => $tablero,
             'fichas' => $matrizFichas,
-            'sigJugadorTurno' => $sigJugadorTurno
+            'sigJugadorTurno' => $sigJugadorTurno,
+            'formJugadores' => $formJugadores->createView()
         ]);
     }
 
     /**
      * @Route("/nueva-partida", name="nueva_partida")
      */
-    public function nuevaPartidaAction()
+    public function nuevaPartidaAction(Request $request)
     {
         $em = $this->getDoctrine()->getManager();
         $tipoFichaRepository = $em->getRepository('AppBundle:TipoFicha');
+        $jugadorRepository = $em->getRepository('AppBundle:Jugador');
 
-        //Inicializamos los tipos de Ficha básicos
-        $tipoFichaX = $tipoFichaRepository->findOneBy(['simbolo' => 'X']);
-        $tipoFichaO = $tipoFichaRepository->findOneBy(['simbolo' => 'O']);
+        //Formulario de inicialización de Partida: introducción de apodos de los jugadores
+        $formJugadores = $this->createForm(JugadoresPartidaType::class, null);
 
-        if (!$tipoFichaX) {
-            $tipoFichaX = new TipoFicha();
-            $tipoFichaX->setSimbolo("X");
+        $formJugadores->handleRequest($request);
 
-            $em->persist($tipoFichaX);
+        if ($formJugadores->isSubmitted() && $formJugadores->isValid()) {
+            //Inicializamos los tipos de Ficha básicos
+            $tipoFichaX = $tipoFichaRepository->findOneBy(['simbolo' => 'X']);
+            $tipoFichaO = $tipoFichaRepository->findOneBy(['simbolo' => 'O']);
+
+            if (!$tipoFichaX) {
+                $tipoFichaX = new TipoFicha();
+                $tipoFichaX->setSimbolo("X");
+
+                $em->persist($tipoFichaX);
+            }
+
+            if (!$tipoFichaO) {
+                $tipoFichaO = new TipoFicha();
+                $tipoFichaO->setSimbolo("O");
+
+                $em->persist($tipoFichaO);
+            }
+
+            //Jugadores y apodos
+            $apodos = $formJugadores->getData();
+
+            $apodoJugador1 = $apodos['jugador_1_apodo'];
+            $apodoJugador2 = $apodos['jugador_2_apodo'];
+
+            $jugador1 = $jugadorRepository->findOneBy(['apodo' => $apodoJugador1]);
+            $jugador2 = $jugadorRepository->findOneBy(['apodo' => $apodoJugador2]);
+
+            if (!$jugador1)
+                $jugador1 = new Jugador();
+            if (!$jugador2)
+                $jugador2 = new Jugador();
+
+            $jugador1->setApodo($apodoJugador1);
+            $jugador2->setApodo($apodoJugador2);
+
+            //Creamos una Partida
+            $partida = new Partida();
+            $partida->setInicio(new \DateTime("now"));
+            $partida->setEnCurso(true);
+            $partida->setFinalizada(false);
+            $partida->setEmpate(false);
+
+            //Creamos un Tablero
+            $tablero = new Tablero();
+            $tablero->setNumColumnas(3);
+            $tablero->setNumFilas(3);
+
+            //Asociamos Partida, Tablero y Jugadores
+            $partida->setTablero($tablero);
+            $tablero->setPartida($partida);
+            $partida->setJugador1($jugador1);
+            $partida->setJugador2($jugador2);
+
+            $em->persist($tablero);
+            $em->persist($partida);
+            $em->persist($jugador1);
+            $em->persist($jugador2);
+
+            $em->flush();
+
+            return $this->redirectToRoute('homepage');
         }
-
-        if (!$tipoFichaO) {
-            $tipoFichaO = new TipoFicha();
-            $tipoFichaO->setSimbolo("O");
-
-            $em->persist($tipoFichaO);
-        }
-
-        //Creamos una Partida
-        $partida = new Partida();
-        $partida->setInicio(new \DateTime("now"));
-        $partida->setEnCurso(true);
-        $partida->setFinalizada(false);
-        $partida->setEmpate(false);
-
-        //Creamos un Tablero
-        $tablero = new Tablero();
-        $tablero->setNumColumnas(3);
-        $tablero->setNumFilas(3);
-
-        //Creamos dos Jugadores
-        $jugador1 = new Jugador();
-        $jugador2 = new Jugador();
-        $jugador1->setApodo("Jugador 1")
-            ->setNombre("Jugador 1")
-            ->setApellido("Jugador 1");
-        $jugador2->setApodo("Jugador 2")
-            ->setNombre("Jugador 2")
-            ->setApellido("Jugador 2");
-
-        //Asociamos Partida, Tablero y Jugadores
-        $partida->setTablero($tablero);
-        $tablero->setPartida($partida);
-        $partida->setJugador1($jugador1);
-        $partida->setJugador2($jugador2);
-
-        $em->persist($tablero);
-        $em->persist($partida);
-        $em->persist($jugador1);
-        $em->persist($jugador2);
-
-        $em->flush();
-
-        return $this->redirectToRoute('homepage');
     }
 
     /**
