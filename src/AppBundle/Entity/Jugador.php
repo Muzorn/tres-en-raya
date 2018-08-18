@@ -24,21 +24,21 @@ class Jugador
     /**
      * @var string
      *
-     * @ORM\Column(name="nombre", type="string", length=30)
+     * @ORM\Column(name="nombre", type="string", length=30, nullable=true)
      */
     private $nombre;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="apellido", type="string", length=15)
+     * @ORM\Column(name="apellido", type="string", length=15, nullable=true)
      */
     private $apellido;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="apodo", type="string", length=10)
+     * @ORM\Column(name="apodo", type="string", length=10, unique=true)
      */
     private $apodo;
 
@@ -125,4 +125,3 @@ class Jugador
         return $this->apodo;
     }
 }
-

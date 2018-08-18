@@ -1,0 +1,38 @@
+<!-- Modal -->
+<div class="modal fade" id="nuevaPartida" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-center" id="exampleModalLabel">Empezar nueva partida</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                {% form_theme formJugadores 'bootstrap_4_layout.html.twig' %}
+                {{ form_start(formJugadores, {'action': path('nueva_partida'), 'method': 'POST'}) }}
+                <div class="row">
+                    <div class="col-sm-12 col-md-6 col-lg-6">
+                        <h5 class=""><i class="fas fa-user"></i> Jugador 1</h5>
+                        {{ form_row(formJugadores.jugador_1_apodo) }}
+                        {{ form_widget(formJugadores.jugador_1_apodo) }}
+                    </div>
+                    <div class="col-sm-12 col-md-6 col-lg-6">
+                        <h5 class=""><i class="fas fa-user"></i> Jugador 2</h5>
+                        {{ form_row(formJugadores.jugador_2_apodo) }}
+                        {{ form_widget(formJugadores.jugador_2_apodo) }}
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">
+                    <i class="fas fa-times"></i> Cancelar
+                </button>
+                <button type="submit" class="btn btn-success">
+                    <i class="far fa-play-circle"></i> Empezar
+                </button>
+                {{ form_end(formJugadores) }}
+            </div>
+        </div>
+    </div>
+</div>
