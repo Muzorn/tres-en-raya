@@ -9,6 +9,7 @@ use AppBundle\Entity\Tablero;
 use AppBundle\Entity\TipoFicha;
 use AppBundle\Entity\Turno;
 use AppBundle\Form\JugadoresPartidaType;
+use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
@@ -170,10 +171,6 @@ class DefaultController extends Controller
                 $tipoFichaX = $tipoFichaRepository->findOneBy(['simbolo' => 'X']);
                 $tipoFichaO = $tipoFichaRepository->findOneBy(['simbolo' => 'O']);
 
-                //Jugamos turno
-                $turno = new Turno();
-                $em->persist($turno);
-
                 //Ficha
                 $ficha = new Ficha();
                 $em->persist($ficha);
@@ -188,9 +185,6 @@ class DefaultController extends Controller
                     $ficha->setTipo($tipoFichaO);
                 }
 
-                $partida->addTurno($turno);
-                $turno->setPartida($partida);
-
                 $tablero->addFicha($ficha);
 
                 $ficha->setJugador($jugador);
@@ -198,10 +192,23 @@ class DefaultController extends Controller
                 $ficha->setPosColumna($columna);
                 $ficha->setTablero($tablero);
 
-                $turno->setFicha($ficha);
-                $turno->setJugadoPor($jugador);
+                try {
+                    //Jugamos turno
+                    $turno = new Turno();
+                    $em->persist($turno);
 
-                $em->flush();
+                    $partida->addTurno($turno);
+                    $turno->setPartida($partida);
+
+                    $turno->setFicha($ficha);
+                    $turno->setJugadoPor($jugador);
+
+                    $em->flush();
+                } catch (UniqueConstraintViolationException $e) {
+                    $this->addFlash('error', '¡Ya hay una ficha puesta en esa casilla!');
+
+                    return $this->redirectToRoute('homepage');
+                }
             }
         }
 

@@ -4,11 +4,15 @@ namespace AppBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Doctrine\ORM\Mapping\UniqueConstraint;
+
 /**
  * Ficha
  *
- * @ORM\Table(name="ficha")
+ * @ORM\Table(name="ficha", uniqueConstraints={@UniqueConstraint(name="uk_ficha_tablero", columns={"tablero_id", "pos_fila", "pos_columna"})})
  * @ORM\Entity(repositoryClass="AppBundle\Repository\FichaRepository")
+ * @UniqueEntity(fields={"tablero_id", "pos_fila", "pos_columna"})
  */
 class Ficha
 {
