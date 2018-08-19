@@ -151,8 +151,11 @@ class DefaultController extends Controller
      * @ParamConverter("partida", options={"id" : "partida_id"})
      *
      */
-    public function ponerFichaAction(Partida $partida, $fila, $columna)
+    public function ponerFichaAction(Partida $partida = null, $fila, $columna)
     {
+        if (!$partida)
+            return $this->redirectToRoute('homepage');
+
         $em = $this->getDoctrine()->getManager();
         $partidaRepo = $em->getRepository('AppBundle:Partida');
         $tableroRepository = $em->getRepository('AppBundle:Tablero');
