@@ -9,11 +9,11 @@ use AppBundle\Entity\Tablero;
 use AppBundle\Entity\TipoFicha;
 use AppBundle\Entity\Turno;
 use AppBundle\Form\JugadoresPartidaType;
+use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Validator\Constraints\Date;
 
 class DefaultController extends Controller
 {
@@ -94,6 +94,11 @@ class DefaultController extends Controller
             $apodoJugador1 = $apodos['jugador_1_apodo'];
             $apodoJugador2 = $apodos['jugador_2_apodo'];
 
+            if ($apodoJugador1 === $apodoJugador2) {
+                $this->addFlash('error', '¡Error al incializar la partida: no puede haber dos jugadores con el mismo apodo!');
+                return $this->redirectToRoute('homepage');
+            }
+
             $jugador1 = $jugadorRepository->findOneBy(['apodo' => $apodoJugador1]);
             $jugador2 = $jugadorRepository->findOneBy(['apodo' => $apodoJugador2]);
 
@@ -130,18 +135,27 @@ class DefaultController extends Controller
 
             $em->flush();
 
+            $this->addFlash('notice', '¡La partida ha comenzado!');
+
             return $this->redirectToRoute('homepage');
         }
+
+        $this->addFlash('error', '¡Error al incializar la partida!');
+
+        return $this->redirectToRoute('homepage');
     }
 
     /**
-     * @Route("/partida/{id}/poner-ficha/{fila}-{columna}", name="poner_ficha")
+     * @Route("/partida/{partida_id}/poner-ficha/{fila}-{columna}", name="poner_ficha")
      *
-     * @ParamConverter("partida", options={"mapping": {"id" : "id"}})
+     * @ParamConverter("partida", options={"id" : "partida_id"})
      *
      */
-    public function ponerFichaAction(Partida $partida, $fila, $columna)
+    public function ponerFichaAction(Partida $partida = null, $fila, $columna)
     {
+        if (!$partida)
+            return $this->redirectToRoute('homepage');
+
         $em = $this->getDoctrine()->getManager();
         $partidaRepo = $em->getRepository('AppBundle:Partida');
         $tableroRepository = $em->getRepository('AppBundle:Tablero');
@@ -150,48 +164,65 @@ class DefaultController extends Controller
         $tablero = $partida->getTablero();
         $dimensionTablero = $tablero->getDimension();
 
-        $numFichasPuestas = $tableroRepository->getNumeroFichasPuestas($tablero);
+        //Controlamos que la Ficha se ponga dentro de los límites del Tablero
+        if ($fila < 0 || $fila > ($tablero->getNumFilas() - 1) || $columna < 0 || $columna > ($tablero->getNumColumnas() - 1)) {
+            $this->addFlash('error', '¡No puedes poner una ficha fuera del tablero!');
 
-        //Comprobar si se puede poner ficha
-        if ($numFichasPuestas >= 0 && $numFichasPuestas <= ($dimensionTablero - 1)) {
-            //Tipos de Ficha
-            $tipoFichaX = $tipoFichaRepository->findOneBy(['simbolo' => 'X']);
-            $tipoFichaO = $tipoFichaRepository->findOneBy(['simbolo' => 'O']);
-
-            //Jugamos turno
-            $turno = new Turno();
-            $em->persist($turno);
-
-            //Ficha
-            $ficha = new Ficha();
-            $em->persist($ficha);
-
-            //Todavía no se ha puesto ninguna ficha (primer turno) o turno del jugador 1
-            if ($numFichasPuestas === 0 || ($numFichasPuestas % 2) === 0) {
-                $jugador = $partida->getJugador1();
-                $ficha->setTipo($tipoFichaX);
-            }
-            else { //Turno del jugador 2
-                $jugador = $partida->getJugador2();
-                $ficha->setTipo($tipoFichaO);
-            }
-
-            $partida->addTurno($turno);
-            $turno->setPartida($partida);
-
-            $tablero->addFicha($ficha);
-
-            $ficha->setJugador($jugador);
-            $ficha->setPosFila($fila);
-            $ficha->setPosColumna($columna);
-            $ficha->setTablero($tablero);
-
-            $turno->setFicha($ficha);
-            $turno->setJugadoPor($jugador);
-
-            $em->flush();
+            return $this->redirectToRoute('homepage');
         }
 
+        $numFichasPuestas = $tableroRepository->getNumeroFichasPuestas($tablero);
+
+        //Sólo permitimos poner Ficha si la Partida sigue en curso
+        if ($partida->getEnCurso() || !$partida->getFinalizada()) {
+            //Comprobamos cuántas Fichas hay puestas en el Tablero para saber si podemos poner una
+            if ($numFichasPuestas >= 0 && $numFichasPuestas <= ($dimensionTablero - 1)) {
+                //Tipos de Ficha
+                $tipoFichaX = $tipoFichaRepository->findOneBy(['simbolo' => 'X']);
+                $tipoFichaO = $tipoFichaRepository->findOneBy(['simbolo' => 'O']);
+
+                //Ficha
+                $ficha = new Ficha();
+                $em->persist($ficha);
+
+                //Todavía no se ha puesto ninguna ficha (primer turno) o turno del jugador 1
+                if ($numFichasPuestas === 0 || ($numFichasPuestas % 2) === 0) {
+                    $jugador = $partida->getJugador1();
+                    $ficha->setTipo($tipoFichaX);
+                }
+                else { //Turno del jugador 2
+                    $jugador = $partida->getJugador2();
+                    $ficha->setTipo($tipoFichaO);
+                }
+
+                $tablero->addFicha($ficha);
+
+                $ficha->setJugador($jugador);
+                $ficha->setPosFila($fila);
+                $ficha->setPosColumna($columna);
+                $ficha->setTablero($tablero);
+
+                try {
+                    //Jugamos turno
+                    $turno = new Turno();
+                    $em->persist($turno);
+
+                    $partida->addTurno($turno);
+                    $turno->setPartida($partida);
+
+                    $turno->setFicha($ficha);
+                    $turno->setJugadoPor($jugador);
+
+                    $em->flush();
+                } catch (UniqueConstraintViolationException $e) {
+                    $this->addFlash('error', '¡Ya hay una ficha puesta en esa casilla!');
+
+                    return $this->redirectToRoute('homepage');
+                }
+            }
+        }
+
+        //Cada vez que se pone una Ficha, comprobamos si se ha hecho tres en raya
         $matrizFichas = $tableroRepository->getMatrizFichasPuestas($tablero);
         $ganador = $partidaRepo->obtenerGanador($partida, $matrizFichas);
 

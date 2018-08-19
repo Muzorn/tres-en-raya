@@ -13,10 +13,18 @@ class JugadoresPartidaType extends AbstractType
     {
         $builder
             ->add('jugador_1_apodo', TextType::class, [
-                'label' => 'Apodo'
+                'attr' => [
+                    'maxlength' => 10
+                ],
+                'label' => 'Apodo',
+                'empty_data' => 'Jugador 1'
             ])
             ->add('jugador_2_apodo', TextType::class, [
-                'label' => 'Apodo'
+                'attr' => [
+                    'maxlength' => 10
+                ],
+                'label' => 'Apodo',
+                'empty_data' => 'Jugador 2'
             ])
         ;
     }
