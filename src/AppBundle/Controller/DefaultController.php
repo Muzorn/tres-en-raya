@@ -164,6 +164,13 @@ class DefaultController extends Controller
         $tablero = $partida->getTablero();
         $dimensionTablero = $tablero->getDimension();
 
+        //Controlamos que la Ficha se ponga dentro de los límites del Tablero
+        if ($fila < 0 || $fila > ($tablero->getNumFilas() - 1) || $columna < 0 || $columna > ($tablero->getNumColumnas() - 1)) {
+            $this->addFlash('error', '¡No puedes poner una ficha fuera del tablero!');
+
+            return $this->redirectToRoute('homepage');
+        }
+
         $numFichasPuestas = $tableroRepository->getNumeroFichasPuestas($tablero);
 
         //Sólo permitimos poner Ficha si la Partida sigue en curso
